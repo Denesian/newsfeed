@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type='text/javascript'>
+  
+
+
+  function addFavorite(articleNode) {
+   if(localStorage){
+  $(document).ready(function(){
+    $(".favorite").click(function(){
+      // Get input name
+      var firstName = articleNode;
+      
+      // Store data
+        localStorage.setItem("first_name", firstName);
+      alert("Your first name is saved.");
+    });
+    $(".access").click(function(){
+      // Retrieve data
+        alert("Hi, " + localStorage.getItem("first_name"));
+    });
+  });
+} else{
+    alert("Sorry, your browser do not support local storage.");
+}
+}
+
+function favorite(){
+  alert("foo"); 
+}
+
+  function setCookie(){
+    var today = new Date();
+    var d = new Date("December 31, 2023")
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = "date" + "=" + today + ";" + expires + ";path=/";
+
+  }
+
+  function getCookie(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+  }
+
+  function checkCookie(){
+   if (document.cookie == "") {
+	setCookie();
+   }
+   else {
+   date = getCookie("date");
+   document.write(date);
+   setCookie();
+   }
+   }
+  function compareItems(a,b) {
+    //console.log(a.querySelector.pubDate);
+	var date1 = Date.parse(a.querySelector('pubDate').textContent);
+	var date2 = Date.parse(b.querySelector('pubDate').textContent);
+
+    return date2 - date1;
+}
+      var handleData = function(data) {
+        // data is a DOM-like object, so `querySelectorAll` works
+	
+        const items = Array.from(data.querySelectorAll('item'));
+		//var testItems = [testObject1, testObject2];
+		//testItems.sort(compareItems);
+		items.sort(compareItems);
+    
+
+        // map the list of items into nodes for html
+        const nodes = items.map(function(item) {
+          // make a node for the title
+          const titleNode = document.createElement('strong');
+          titleNode.innerHTML = item.querySelector('title').textContent +
+            '&nbsp;';
+
+          // make a node for the date
+          const dateNode = document.createElement('em');
+          dateNode.innerHTML = item.querySelector('pubDate').textContent +
+            '&nbsp;';
+
+          // make a node for the link
+          const linkNode = document.createElement('a');
+          linkNode.href = item.querySelector('link').textContent;
+          linkNode.textContent = '(link)';
+
+          // make a node for everything
+          const articleNode = document.createElement('article');
+          articleNode.appendChild(titleNode);
+          articleNode.appendChild(dateNode);
+          articleNode.appendChild(linkNode);
+
+          var btn = document.createElement("BUTTON");
+          var t = document.createTextNode("favorite");
+          btn.appendChild(t);
+          btn.setAttribute("id", "favorite");
+          btn.setAttribute("onclick", "favorite()");
+          //btn.addEventListener("click", addFavorite(articleNode));
+          articleNode.appendChild(btn);
+
+
+          return articleNode;
+        });
+
+        // clear out the container
+        const container = document.getElementById('content');
+        // container.innerHTML = '';
+
+        // append them all to the container
+        nodes.forEach(function(node) {
+          container.appendChild(node);
+        });
+      };
+
+      var handleSelectionChange = function() {
+        // store the radio buttons as an array
+        const buttons = Array.from(document.querySelectorAll('input'));
+
+        // find the button that is checked and get its value
+
+
+        var checkedValues = $('input:checkbox:checked').map(function()
+        {
+          return this.value;
+        }).get();
+
+        //var news = checkedValues[0];
+        var allNews = [];
+        const container = document.getElementById('content');
+        container.innerHTML = '';
+
+        checkedValues.forEach(function(news) {
+			var url = "";
+		  if (news == "MLB"){
+			url = 'http://espn.go.com/espn/rss/MLB/news';
+		  }
+		  else if (news == "NFL") {
+			url = 'http://espn.go.com/espn/rss/NFL/news';
+		  }
+		  else if (news == "NHL") {
+			url = 'http://espn.go.com/espn/rss/NHL/news';
+		  }
+		  
+
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', url);
+
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              handleData(xhr.responseXML);
+            } else {
+              const container = document.querySelector('content');
+              container.innerHTML = '';
+              container.textValue = 'An error occured reading the stream';
+            }
+          };
+
+          xhr.send();
+        });
+
+      };
+
+      var init = function() {
+
+        // connect the change of event of the form to the method
+        document.querySelector('form').addEventListener('change',
+            handleSelectionChange);
+        
+        handleSelectionChange(); // call the method to simulate the first
+                                 // selection
+      };
+
+      // call init when the page has loaded
+      window.onload = init;
+    </script>
+  </head>
+  <body>
+  You last visited this page at: <script>checkCookie();</script>
+  </span>
+    <h1> News Feed </h1>
+    <form>
+      <input type='checkbox' name='sport' value='MLB' checked /> MLB <br />
+      <input type='checkbox' name='sport' value='NBA' /> NBA <br />
+      <input type='checkbox' name='sport' value='NFL' /> NFL <br />
+      <input type='checkbox' name='sport' value='NHL' /> NHL <br />
+    </form>
+
+    <div id='content' />
+  </body>
+</html>
