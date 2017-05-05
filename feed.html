@@ -4,6 +4,7 @@
 <head>
   <title></title>
   <!-- Latest compiled and minified CSS -->
+
 <link rel="stylesheet" href = "style.css">
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
@@ -11,6 +12,7 @@
  <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
   <script type='text/javascript'>
   
 $(document).ready(function(){
@@ -35,6 +37,7 @@ $(document).ready(function(){
 
     });
   });
+
   $("#signupButton").click(function(){
     username=$("#signupUsername").val();
 	password=$("#signupPassword").val();
@@ -57,6 +60,7 @@ $(document).ready(function(){
 else {
 
 document.getElementById('login').style.display = 'none';
+
 document.getElementById('signup').style.display = 'none';
 document.getElementById('container').style.display = '';
 }
@@ -86,6 +90,7 @@ alert("sdfdsfdsf");
     alert("Sorry, your browser do not support local storage.");
 }
 }
+
 
 function favorite(title, date){
   alert(title + date); 
@@ -173,6 +178,7 @@ function favorite(title, date){
           btn.setAttribute("id", "favorite");
           btn.setAttribute("class", "btn");
 		  var foo = "foobar";
+
 		  btn.setAttribute('onclick', 'favorite("'+title+'", "'+date+'")');
 		  var hello = 'heldfgdfglo';
 		  //var fav = 'favorite('+hello+')'
@@ -255,13 +261,14 @@ function favorite(title, date){
         
         //handleSelectionChange(); // call the method to simulate the first
                                  // selection
-      };
+      }
 
       // call init when the page has loaded
       window.onload = init;
     </script>
   </head>
   <body>
+
   <div id ="container"> <!-- begin logged in container -->
   You last visited this page at: <script>checkCookie();</script>
   <h1> News Feed </h1>
@@ -275,6 +282,7 @@ function favorite(title, date){
 
     <div id='content'></div>
 	</div> <!-- end logged in container --> 
+  <div id="container">
   <div id = "login">
   <h1> Log in </h1>
   <form method="post">
