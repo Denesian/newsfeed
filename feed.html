@@ -1,11 +1,69 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <title></title>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href = "style.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+ <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   <script type='text/javascript'>
   
+$(document).ready(function(){
+   //document.getElementById('content').setAttribute("hidden", "true");
+   if (localStorage.getItem("username") == "" || localStorage.getItem("username") == null) {
+   document.getElementById('container').style.display = 'none';
+  $("#loginButton").click(function(){
+    username=$("#username").val();
+    password=$("#password").val();
+    $.ajax({
+      type:"POST",
+      url: "login.php",
+      data: "username="+username+"&password="+password,
+      success: function(){
+        //document.getElementById('content').setAttribute("hidden", "false");
+        alert("Login success");
+        localStorage.setItem('username', username);
+
+           document.getElementById('container').style.display = '';
+
+      }
+
+    });
+  });
+  $("#signupButton").click(function(){
+    username=$("#signupUsername").val();
+	password=$("#signupPassword").val();
+	$.ajax({
+      type:"POST",
+      url: "signup.php",
+      data: "username="+username+"&password="+password,
+      success: function(){
+        //document.getElementById('content').setAttribute("hidden", "false");
+        alert("Sign up success");
+        localStorage.setItem('username', username);
+
+           document.getElementById('container').style.display = '';
+
+      }
+
+    });
+  });
+}
+else {
+
+document.getElementById('login').style.display = 'none';
+document.getElementById('signup').style.display = 'none';
+document.getElementById('container').style.display = '';
+}
+$("#favorite").click(function(){
+alert("sdfdsfdsf");
+});
+    });
 
 
   function addFavorite(articleNode) {
@@ -29,8 +87,8 @@
 }
 }
 
-function favorite(){
-  alert("foo"); 
+function favorite(title, date){
+  alert(title + date); 
 }
 
   function setCookie(){
@@ -86,14 +144,15 @@ function favorite(){
         const nodes = items.map(function(item) {
           // make a node for the title
           const titleNode = document.createElement('strong');
-          titleNode.innerHTML = item.querySelector('title').textContent +
+          var title = item.querySelector('title').textContent +
             '&nbsp;';
+		titleNode.innerHTML = title;
 
           // make a node for the date
           const dateNode = document.createElement('em');
-          dateNode.innerHTML = item.querySelector('pubDate').textContent +
+          var date = item.querySelector('pubDate').textContent +
             '&nbsp;';
-
+		  dateNode.innerHTML = date;
           // make a node for the link
           const linkNode = document.createElement('a');
           linkNode.href = item.querySelector('link').textContent;
@@ -105,13 +164,23 @@ function favorite(){
           articleNode.appendChild(dateNode);
           articleNode.appendChild(linkNode);
 
+		  const div = document.createElement('div');
+		  div.setAttribute("id", "fav");
+		  
           var btn = document.createElement("BUTTON");
           var t = document.createTextNode("favorite");
           btn.appendChild(t);
           btn.setAttribute("id", "favorite");
-          btn.setAttribute("onclick", "favorite()");
+          btn.setAttribute("class", "btn");
+		  var foo = "foobar";
+		  btn.setAttribute('onclick', 'favorite("'+title+'", "'+date+'")');
+		  var hello = 'heldfgdfglo';
+		  //var fav = 'favorite('+hello+')'
+          //btn.setAttribute("onclick", fav);
+		  div.appendChild(btn);
+		  //div.innerHTML = '<button class="btn" type="button" onclick=\'favorite(hello)\'>Favorite</button>'
           //btn.addEventListener("click", addFavorite(articleNode));
-          articleNode.appendChild(btn);
+          articleNode.appendChild(div);
 
 
           return articleNode;
@@ -129,7 +198,7 @@ function favorite(){
 
       var handleSelectionChange = function() {
         // store the radio buttons as an array
-        const buttons = Array.from(document.querySelectorAll('input'));
+        const buttons = Array.from(document.querySelectorAll('#newsSource'));
 
         // find the button that is checked and get its value
 
@@ -175,13 +244,16 @@ function favorite(){
 
       };
 
-      var init = function() {
+     var init = function() {
 
-        // connect the change of event of the form to the method
-        document.querySelector('form').addEventListener('change',
+         //connect the change of event of the form to the method
+		
+		//document.getElementById('news').onchange = handleSelectionChange();
+		const selection = document.querySelector('form#selector');
+        selection.addEventListener('change',
             handleSelectionChange);
         
-        handleSelectionChange(); // call the method to simulate the first
+        //handleSelectionChange(); // call the method to simulate the first
                                  // selection
       };
 
@@ -190,16 +262,38 @@ function favorite(){
     </script>
   </head>
   <body>
+  <div id ="container"> <!-- begin logged in container -->
   You last visited this page at: <script>checkCookie();</script>
-  </span>
-    <h1> News Feed </h1>
-    <form>
-      <input type='checkbox' name='sport' value='MLB' checked /> MLB <br />
-      <input type='checkbox' name='sport' value='NBA' /> NBA <br />
-      <input type='checkbox' name='sport' value='NFL' /> NFL <br />
-      <input type='checkbox' name='sport' value='NHL' /> NHL <br />
+  <h1> News Feed </h1>
+    <form id = "selector" class="selector">
+      <input id = "newsSource" type='checkbox' name='sport' value='MLB' /> MLB <br />
+      <input id = "newsSource" type='checkbox' name='sport' value='NBA' /> NBA <br />
+      <input id = "newsSource" type='checkbox' name='sport' value='NFL' /> NFL <br />
+      <input id = "newsSource" type='checkbox' name='sport' value='NHL' /> NHL <br />
     </form>
+	
 
-    <div id='content' />
+    <div id='content'></div>
+	</div> <!-- end logged in container --> 
+  <div id = "login">
+  <h1> Log in </h1>
+  <form method="post">
+<input type="text" name="username" id="username">
+<input type="password" name="password" id="password">
+<input type="submit" name="login" id="loginButton" value = "Log in">
+  </form>
+  </div>
+
+  <div id="signup">
+  <h1> Create Account </h1>
+  <form method = "post" class = "form-control">
+  <input type = "text" name = "username" id = "signupUsername">
+  <input type = "password" name = "password" id = "signupPassword">
+  <input type = "submit" name = "Signup" id = "signupButton" value = "Create Account">
+  </div>
+
+    
+    </div>
+
   </body>
 </html>
