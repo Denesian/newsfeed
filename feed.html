@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,6 +15,7 @@
   <script type='text/javascript'>
   
 $(document).ready(function(){
+  getFavorites();
    //document.getElementById('content').setAttribute("hidden", "true");
    if (localStorage.getItem("username") == "" || localStorage.getItem("username") == null) {
    document.getElementById('container').style.display = 'none';
@@ -70,31 +70,186 @@ alert("sdfdsfdsf");
     });
 
 
-  function addFavorite(articleNode) {
-   if(localStorage){
-  $(document).ready(function(){
-    $(".favorite").click(function(){
-      // Get input name
-      var firstName = articleNode;
-      
+
+function favorite(ID, title, date){
+  var text = localStorage.getItem(localStorage.getItem("username")+"favorites");
+  if (text==null){
+      var jsonObj = {};
+      jsonObj.favorites = [];
+      var newFav = {};
+	  newFav['ID'] = ID;
+      //newFav['url']=link;
+      newFav['title']=title.replace(/"/g, '\\"');
+      //newFav['desc']=desc.replace(/"/g, '\\"');
+      newFav['date']=date;
+      jsonObj.favorites.push(newFav);
+      var myJSON = JSON.stringify(jsonObj);
       // Store data
-        localStorage.setItem("first_name", firstName);
-      alert("Your first name is saved.");
-    });
-    $(".access").click(function(){
-      // Retrieve data
-        alert("Hi, " + localStorage.getItem("first_name"));
-    });
-  });
-} else{
-    alert("Sorry, your browser do not support local storage.");
+      localStorage.setItem(localStorage.getItem("username") + "favorites", myJSON);
+    } 
+	else 
+	{
+	  var jsonObj = JSON.parse(text);
+	  var newFav = {};
+	  //newFav['url']=link;
+    newFav['ID'] = ID;
+	  newFav['title']=title.replace(/"/g, '\\"');
+	  //newFav['desc']=desc.replace(/"/g, '\\"');
+	  newFav['date']=date;
+	  jsonObj.favorites.push(newFav);
+	  var myJSON = JSON.stringify(jsonObj);
+	  // Store data
+	  localStorage.setItem(localStorage.getItem("username") + "favorites", myJSON);
 }
+getFavorites();
+}
+
+function unfavorite(ID, title, date){
+  if(localStorage){
+    //var link = document.getElementById(str1).innerHTML;
+    //var title = document.getElementById(str2).innerHTML;
+    //var desc = document.getElementById(str3).innerHTML;
+    //var date = document.getElementById(str4).innerHTML;
+    var newDiv = '<p>'+title+'<br>'+date+'<br><button class="btn btn-success" id="'+ID+
+    'button" type="button" onclick=\'favorite("'+ID+'","'+
+    title+'","'+date+'")\'>Add Favorite</button></p>'+
+    '<div id="'+ID+'b" hidden>'+title+'</div>'+
+    '<div id="'+ID+'d" hidden>'+date+'</div>';
+    document.getElementById("fav"+ID).innerHTML = newDiv;
+    var text = localStorage.getItem(localStorage.getItem("username") + "favorites");
+    if (text!=null){
+      var jsonObj = JSON.parse(text);
+      var removeFav = {};
+      //removeFav['url']=link;
+      removeFav['ID'] = ID;
+      removeFav['title']=title.replace(/"/g, '\\"');
+      //removeFav['desc']=desc.replace(/"/g, '\\"');
+      removeFav['date']=date;
+      var index = null;
+      for (i=0; i<jsonObj.favorites.length; i++) {
+        var obj = jsonObj.favorites[i];
+        for (var key in obj){
+          var attrValue = obj[key];
+          if (key == "ID") {
+            if (attrValue==removeFav.ID){
+              index = i;
+              break;
+            }
+          }
+        }
+      }
+      jsonObj.favorites.splice(index, 1);
+      var myJSON = JSON.stringify(jsonObj);
+      // Store data
+      localStorage.setItem(localStorage.getItem("username") + "favorites", myJSON);
+    }
+    getFavorites();
+    if (ID.substring(0,3)=="fav"){
+      var max = document.getElementById("content").innerHTML;
+      for (y=0; y<max; y++) {
+        var divURL = document.getElementById(ID+"a");
+        if (divURL!=null){
+          if (divURL.innerHTML==link){
+            document.getElementById(ID+"button").setAttribute('onclick', 'favorite("'+y+'","'+y+'a","'+y+'b","'+y+'c","'+y+'d")');
+            document.getElementById(ID+"button").innerHTML = "Add Favorite";
+            document.getElementById(ID+"button").setAttribute('class', 'btn btn-success');
+          }
+        }
+      }
+    }
+  } else {
+    alert("Sorry, you will not be able to utilize favorites as your browser does not support local storage.");
+  }
+}
+
+function checkFeedForFavorites() {
+  if (localStorage) {
+    var text = localStorage.getItem(localStorage.getItem("username") + "favorites");
+    var jsonObj = JSON.parse(text);
+    if (jsonObj != null){
+      if (jsonObj.favorites.length!=0) {
+        var max = document.getElementById("content").innerHTML;
+        for (i=0; i<jsonObj.favorites.length; i++) {
+          var obj = jsonObj.favorites[i];
+          var link = "";
+          for (var key in obj){
+            var attrValue = obj[key];
+            if (key == "ID") {
+              ID = attrValue;
+            } 
+          }
+          for (y=0; y<50; y++) {
+            var divID = document.getElementById("fav"+ ID);
+            if (divID!=null){
+                var button = "button" +ID;
+                //document.getElementById("button" + ID).setAttribute('onclick', 'unfavorite("'+ID+'","'+title+'a","'+date+'")');
+                //document.getElementById(y+"button").innerHTML = "Remove Favorite";
+                //document.getElementById(y+"button").setAttribute('class', 'btn btn-danger');
+              
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function getFavorites() {
+  var divContent = "";
+  if (localStorage) {
+    var text = localStorage.getItem(localStorage.getItem("username") + "favorites");
+    var jsonObj = JSON.parse(text);
+    if (jsonObj == null){
+      divContent += "<h3>Favorites</h3><p>You currently have no favorites.</p>";
+    } else {
+      if (jsonObj.favorites.length==0) {
+        divContent += "<h3>Favorites</h3><p>You currently have no favorites.</p>";
+      } else {
+        divContent += '<h3>Favorites</h3>';
+        for (i=0; i<jsonObj.favorites.length; i++) {
+          
+          var obj = jsonObj.favorites[i];
+          var link = "";
+		  var ID = "";
+          var title = "";
+          var desc = "";
+          var date = "";
+          for (var key in obj){
+            var attrValue = obj[key];
+			if (key == "ID"){
+				ID = attrValue;
+				divContent += '<div id="fav'+ID+'">';
+				}
+            if (key == "url") {
+              link = attrValue;
+              divContent += '<p><a href="'+link+'">';
+            } else if (key=="title") {
+              title = attrValue.replace(/\\/g, '');
+              divContent += attrValue+'</a><br>';
+            } else if (key=="desc") {
+              desc = attrValue.replace(/\\/g, '');
+              divContent += desc+'<br>'
+            } else if (key=="date") {
+              date = attrValue;
+              divContent += date+'<br><button class="btn" id="fav'+
+              i+'button" type="button" onclick=\'unfavorite("'+ID+'","'
+              +title+'","'+date+'")\'>Remove Favorite</button></p>'+
+              '<div id="fav'+i+'a" hidden>'+link+'</div>'+
+              '<div id="fav'+i+'b" hidden>'+title+'</div>'+
+              '<div id="fav'+i+'c" hidden>'+desc+'</div>'+
+              '<div id="fav'+i+'d" hidden>'+date+'</div></div>';
+            }
+          }
+        }
+      }
+    }
+  } else {
+    alert("Sorry, you will not be able to store favorite articles on this site as your browser does not support local storage.");
+  }
+  document.getElementById("favorites").innerHTML=divContent;
 }
 
 
-function favorite(title, date){
-  alert(title + date); 
-}
 
   function setCookie(){
     var today = new Date();
@@ -136,21 +291,23 @@ function favorite(title, date){
 
     return date2 - date1;
 }
-      var handleData = function(data) {
+var handleData = function(data, sourceID) {
         // data is a DOM-like object, so `querySelectorAll` works
 	
-        const items = Array.from(data.querySelectorAll('item'));
-		//var testItems = [testObject1, testObject2];
-		//testItems.sort(compareItems);
-		items.sort(compareItems);
+  const items = Array.from(data.querySelectorAll('item'));
+  items.sort(compareItems);
     
 
         // map the list of items into nodes for html
-        const nodes = items.map(function(item) {
+        const nodes = items.map(function(item, index) {
           // make a node for the title
+		  var ID = sourceID + "" + index;
+		  
+		  const IDNode = ID;
           const titleNode = document.createElement('strong');
-          var title = item.querySelector('title').textContent +
+          var title = item.querySelector('title').textContent + ID + 
             '&nbsp;';
+	
 		titleNode.innerHTML = title;
 
           // make a node for the date
@@ -162,6 +319,8 @@ function favorite(title, date){
           const linkNode = document.createElement('a');
           linkNode.href = item.querySelector('link').textContent;
           linkNode.textContent = '(link)';
+		  
+		  
 
           // make a node for everything
           const articleNode = document.createElement('article');
@@ -170,16 +329,18 @@ function favorite(title, date){
           articleNode.appendChild(linkNode);
 
 		  const div = document.createElement('div');
-		  div.setAttribute("id", "fav");
+		  div.setAttribute("id", ID);
 		  
           var btn = document.createElement("BUTTON");
           var t = document.createTextNode("favorite");
           btn.appendChild(t);
-          btn.setAttribute("id", "favorite");
+          btn.setAttribute("id", 'button'+ID+'');
           btn.setAttribute("class", "btn");
 		  var foo = "foobar";
 
-		  btn.setAttribute('onclick', 'favorite("'+title+'", "'+date+'")');
+		  btn.setAttribute('onclick', 'favorite("'+ID+'", "'+title+'", "'+date+'")');
+		  
+		  
 		  var hello = 'heldfgdfglo';
 		  //var fav = 'favorite('+hello+')'
           //btn.setAttribute("onclick", fav);
@@ -221,14 +382,18 @@ function favorite(title, date){
 
         checkedValues.forEach(function(news) {
 			var url = "";
+			var sourceID;
 		  if (news == "MLB"){
 			url = 'http://espn.go.com/espn/rss/MLB/news';
+			sourceID = 0;
 		  }
 		  else if (news == "NFL") {
 			url = 'http://espn.go.com/espn/rss/NFL/news';
+			sourceID = 1;
 		  }
 		  else if (news == "NHL") {
 			url = 'http://espn.go.com/espn/rss/NHL/news';
+			sourceID = 2;
 		  }
 		  
 
@@ -237,13 +402,14 @@ function favorite(title, date){
 
           xhr.onload = function() {
             if (xhr.status === 200) {
-              handleData(xhr.responseXML);
+              handleData(xhr.responseXML, sourceID);
             } else {
               const container = document.querySelector('content');
               container.innerHTML = '';
               container.textValue = 'An error occured reading the stream';
             }
           };
+          checkFeedForFavorites();
 
           xhr.send();
         });
@@ -278,11 +444,14 @@ function favorite(title, date){
       <input id = "newsSource" type='checkbox' name='sport' value='NFL' /> NFL <br />
       <input id = "newsSource" type='checkbox' name='sport' value='NHL' /> NHL <br />
     </form>
-	
+
+<div id="favorites">
+            <h3>Favorites</h3>
+          </div>	
 
     <div id='content'></div>
 	</div> <!-- end logged in container --> 
-  <div id="container">
+  <div class="row justify-content-md-center">
   <div id = "login">
   <h1> Log in </h1>
   <form method="post">
@@ -301,7 +470,7 @@ function favorite(title, date){
   </div>
 
     
-    </div>
+</div>
 
   </body>
 </html>
